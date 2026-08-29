@@ -1,0 +1,8 @@
+.DS_Store
+.vs/
+Assets/ignition-backup-2024/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.zip
+Tools/schedule-poster.html

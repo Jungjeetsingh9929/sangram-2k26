@@ -1,0 +1,32 @@
+{
+  "eventName": "SANGRAM 2026",
+  "eventDate": "2026-10-01T00:00:00+05:30",
+  "registrationUrl": "links.html",
+  "whatsappUrl": "https://chat.whatsapp.com/ED9qVYV13tIEj7Zua2uixJ",
+  "contacts": [
+    {
+      "name": "Vaibhav Tanwar",
+      "role": "Registration Coordinator",
+      "phone": "+91 73401 00759",
+      "email": "registrationcoordinator2k26@gmail.com"
+    },
+    {
+      "name": "Harsh Yadav",
+      "role": "Event Coordinator",
+      "phone": "+91 95113 88104",
+      "email": "eventcoordinator2k26@gmail.com"
+    },
+    {
+      "name": "Abhishek Nehra",
+      "role": "Games Coordinator",
+      "phone": "+91 90241 07141",
+      "email": "gamescoordinator2k26@gmail.com"
+    },
+    {
+      "name": "Ravi Jangid",
+      "role": "Games Coordinator",
+      "phone": "+91 83020 82400",
+      "email": "gamescoordinator2k26@gmail.com"
+    }
+  ]
+}

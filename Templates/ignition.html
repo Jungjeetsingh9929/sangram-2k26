@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../Assets/Logo.png" rel="shortcut icon" type="image/x-icon">
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="../Styles/ignition.css" rel="stylesheet">
+  <link href="../Styles/ignition2026.css?v=game-icons" rel="stylesheet">
+  <link href="../Styles/loader.css" rel="stylesheet">
+  <script defer src="../Scripts/hamburger.js?v=debug-fixes"></script>
+  <script defer src="../Scripts/loaderIndex.js?v=2026-no-cricket"></script>
+  <script defer src="../Scripts/ignition2026.js?v=game-icons"></script>
+  <title>EVENTS - SANGRAM 2026</title>
+</head>
+<body>
+  <div class="loader">
+    <div class="video-wrapper">
+      <video autoplay loop muted playsinline id="video" width="100%">
+        <source src="../Assets/loader.mp4" type="video/mp4">
+      </video>
+      <div class="shadow"></div>
+    </div>
+    <div class="hide">CLICK TO CONTINUE</div>
+  </div>
+
+  <div class="ham-grid">
+    <div class="ham-logo ham-hide"><img src="../Assets/ham-logo.png" alt=""></div>
+    <div class="ham-img ham-hide">
+      <img src="../Assets/ham-img.png" alt=""><span></span>
+    </div>
+    <div class="ham-links">
+      <div>
+        <a href="../index.html">HOME</a>
+        <a href="https://photos.app.goo.gl/xGoufD8RySJaYyUv5">GALLERY</a>
+      </div>
+    </div>
+    <div class="ham-text ham-hide">
+      <img src="../Assets/ham-text.png" alt=""><span></span>
+    </div>
+    <div class="ham-icons ham-hide">
+      <a href="https://chat.whatsapp.com/ED9qVYV13tIEj7Zua2uixJ" target="_blank" rel="noopener">
+        <img aria-hidden="true" src="../Assets/whatsapp.png" class="ham-icon" alt="">
+      </a>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <div class="right">
+      <div class="ham-cont">
+        <div class="hamburger">
+          <span class="ham-1"></span>
+          <span class="ham-2"></span>
+          <span class="ham-3"></span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <header class="heading">
+    <h2 class="ign-head">ALL EVENTS</h2>
+  </header>
+
+  <main class="ignition" aria-live="polite">
+    <p class="events-loading">Loading events...</p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,317 @@
+#about-sec {
+  --offX: 40px;
+  --offY: 30px;
+  font-family: "Montserrat", sans-serif;
+  background-repeat: no-repeat;
+  background-position: 50%;
+  display: flex;
+  position: relative;
+  flex-direction: row;
+  margin-top: 0;
+  align-items: center;
+  padding-top: 120px;
+}
+
+#about-sec * {
+  z-index: 20;
+}
+
+#about-txt {
+  padding: 30px 86px;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.sec-header {
+  align-self: center;
+}
+
+.about-par {
+  font-size: 1rem;
+  transform: translateX(2rem);
+  line-height: 1.2;
+  margin: 14px 0;
+  letter-spacing: 0.5px;
+  font-weight: 400;
+}
+
+#about-line {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  width: 2px;
+  height: 40%;
+  background-color: #eeecec;
+  margin: auto;
+}
+
+#about-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 50%;
+  height: 80%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  padding: 20px 40px;
+  margin: auto;
+}
+
+#about-car-cont {
+  width: 80%;
+  height: min(60%, 300px);
+  align-self: center;
+  justify-content: center;
+  position: relative;
+}
+
+#about-tweet {
+  display: none;
+  height: clamp(80px, 4rem, 128px);
+  width: 70%;
+  background: white;
+  border-radius: 2px;
+}
+
+#about-car {
+  height: 100%;
+  width: calc(100% - 10px);
+}
+
+#about-car-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  transform: translate(var(--offX), var(--offY));
+  background-color: white;
+}
+
+.play-cont {
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(0, 0);
+}
+
+.play-active {
+  opacity: 1;
+  z-index: 20;
+  visibility: visible;
+  transform: translate(0, 0);
+}
+
+.play-init {
+  -webkit-animation: play-anim 500ms ease, play-anim-opac 500ms ease;
+  animation: play-anim 500ms ease, play-anim-opac 500ms ease;
+}
+
+@-webkit-keyframes play-anim {
+  0% {
+    transform: translate(var(--offX), var(--offY));
+  }
+
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@-webkit-keyframes play-anim-opac {
+  0%,
+  20% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes play-anim {
+  0% {
+    transform: translate(var(--offX), var(--offY));
+  }
+
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes play-anim-opac {
+  0%,
+  20% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+#about-dots-cont {
+  position: absolute;
+  top: var(--offY);
+  left: 100%;
+  height: 100%;
+  width: -moz-min-content;
+  width: -webkit-min-content;
+  width: min-content;
+  padding: 0 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#about-sec > img {
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  -o-object-fit: cover;
+  object-fit: cover;
+}
+
+.about-bg {
+  top: -200px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: auto;
+}
+
+.about-bg-phone {
+  display: none;
+}
+
+.about-dot {
+  height: 10px;
+  width: 10px;
+  outline: 2px solid rgba(0, 0, 0, 0.8);
+  border: 1px solid white;
+  border-radius: 50%;
+  margin: 5px 0;
+  background: white;
+}
+
+.about-dot.about-dot-active {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 1200px) {
+  .about-par {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 800px) {
+  #about-sec {
+    flex-direction: column;
+    position: relative;
+    --offX: 24px;
+    --offY: 18px;
+  }
+
+  #about-txt {
+    width: 100%;
+    padding: 20px 40px;
+  }
+
+  .about-par {
+    margin: 10px 0;
+    text-align: center;
+    font-size: 0.9rem;
+    transform: none;
+  }
+
+  #about-line {
+    display: none;
+  }
+
+  #about-right {
+    position: static;
+    height: 350px;
+    grid-template-rows: 1fr;
+    grid-row-gap: 50px;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #about-car-cont {
+    justify-self: center;
+    height: 100%;
+    width: max(60%, 500px);
+  }
+
+  #about-dots-cont {
+    padding: 0 7px;
+  }
+
+  #about-tweet {
+    justify-self: center;
+    width: 80%;
+  }
+
+  .about-bg {
+    top: -40px;
+    height: auto;
+  }
+}
+
+@media (max-width: 500px) {
+  #about-sec {
+    padding-top: 40px;
+    --offX: 19px;
+    --offY: 15px;
+  }
+
+  #about-txt {
+    padding: 20px 40px;
+    margin-bottom: 40px;
+  }
+
+  .about-par {
+    font-size: 0.9rem;
+    margin: 5px 0;
+    text-align: center;
+  }
+
+  #about-right {
+    height: 200px;
+  }
+
+  .about-bg-phone {
+    display: block;
+    top: -40px !important;
+    max-height: 120%;
+  }
+
+  .about-bg {
+    display: none;
+  }
+
+  #about-dots-cont {
+    padding: 0 6px;
+  }
+
+  .dot {
+    height: 7px;
+    width: 7px;
+  }
+
+  #about-car-cont {
+    justify-self: center;
+    height: 100%;
+    width: max(60%, 300px);
+  }
+}
+/*# sourceMappingURL=about.css.map */
