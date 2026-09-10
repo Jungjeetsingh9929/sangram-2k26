@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Live Scores — SANGRAM 2026</title>
+<meta name="description" content="Live scores, fixtures and round timings for SANGRAM 2026, UEM Jaipur." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #0a0e1a;
+    --bg-alt: #0f1524;
+    --surface: #141b2e;
+    --surface-raised: #1a2338;
+    --line: #262f45;
+    --text: #f2f4f8;
+    --muted: #8b93a7;
+    --red: #e5484d;
+    --blue: #3b82f6;
+    --yellow: #f5c518;
+    --green: #34d399;
+    --live: #ff3b30;
+    --gold: #ffb627;
+    --radius: 14px;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: radial-gradient(1200px 600px at 50% -10%, #17203a 0%, var(--bg) 55%) fixed;
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  h1,h2,h3, .score, .brand, .band-time{ font-family: 'Anton', sans-serif; letter-spacing: 0.01em; }
+
+  a{ color: inherit; text-decoration: none; }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--line);
+    position: sticky; top:0; z-index: 20;
+    background: rgba(10,14,26,0.85);
+    backdrop-filter: blur(10px);
+  }
+  .brand{ font-size: 22px; display:flex; align-items:baseline; gap:8px; }
+  .brand span{ color: var(--gold); }
+  .topbar nav{ display:flex; gap: 22px; font-weight:600; font-size: 14px; color: var(--muted); }
+  .topbar nav a:hover{ color: var(--text); }
+
+  /* ---------- Next-round band ---------- */
+  .band{
+    margin: 20px auto 0; max-width: 1080px; padding: 0 20px;
+  }
+  .band-inner{
+    background: linear-gradient(120deg, var(--surface-raised), var(--surface));
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    display:flex; align-items:center; justify-content:space-between; gap: 16px;
+    flex-wrap: wrap;
+  }
+  .band-label{ font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+  .band-game{ font-size: 18px; font-weight: 700; margin-top: 4px; }
+  .band-time{ font-size: 30px; color: var(--gold); display:flex; gap: 10px; }
+  .band-time small{ font-family:'Manrope',sans-serif; font-size: 11px; color: var(--muted); display:block; text-align:center; font-weight:700; }
+  .band-time .unit{ text-align:center; min-width: 46px; }
+
+  /* ---------- Filters ---------- */
+  .filters{
+    max-width: 1080px; margin: 28px auto 0; padding: 0 20px;
+    display:flex; gap: 10px; flex-wrap:wrap;
+  }
+  .filter-btn{
+    background: var(--surface); border: 1px solid var(--line); color: var(--muted);
+    padding: 9px 16px; border-radius: 999px; font-weight:700; font-size: 13px; cursor:pointer;
+  }
+  .filter-btn.active{ background: var(--gold); border-color: var(--gold); color: #1a1305; }
+
+  /* ---------- Grid ---------- */
+  .grid{
+    max-width: 1080px; margin: 20px auto 60px; padding: 0 20px;
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(320px,1fr)); gap: 18px;
+  }
+
+  .card{
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px; position:relative; overflow:hidden;
+  }
+  .card::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:4px;
+  }
+  .card.status-live::before{ background: var(--live); }
+  .card.status-upcoming::before{ background: var(--gold); }
+  .card.status-finished::before{ background: var(--line); }
+
+  .card-head{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 14px; }
+  .game-name{ font-weight: 800; font-size: 15px; }
+  .game-meta{ color: var(--muted); font-size: 12px; margin-top: 3px; }
+
+  .pill{
+    font-size: 11px; font-weight: 800; padding: 5px 10px; border-radius: 999px;
+    display:flex; align-items:center; gap: 6px; white-space:nowrap;
+  }
+  .pill.live{ background: rgba(255,59,48,0.15); color: var(--live); }
+  .pill.upcoming{ background: rgba(255,182,39,0.15); color: var(--gold); }
+  .pill.finished{ background: rgba(139,147,167,0.15); color: var(--muted); }
+  .dot{ width:7px; height:7px; border-radius:50%; background: currentColor; }
+  .pill.live .dot{ animation: pulse 1.2s infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.25; } }
+
+  .matchup{ display:grid; grid-template-columns: 1fr auto 1fr; align-items:center; gap: 10px; }
+  .team{ display:flex; align-items:center; gap: 10px; min-width:0; }
+  .team.right{ flex-direction: row-reverse; text-align:right; }
+  .swatch{ width: 10px; height: 34px; border-radius: 3px; flex-shrink:0; }
+  .team-name{ font-weight: 700; font-size: 14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .score{ font-size: 34px; min-width: 40px; text-align:center; }
+  .score.dim{ color: var(--muted); }
+
+  .card-foot{
+    margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:center; font-size: 12px; color: var(--muted);
+  }
+  .foot-countdown{ color: var(--gold); font-weight: 700; }
+
+  .empty, .setup{
+    max-width: 640px; margin: 60px auto; text-align:center; padding: 30px 20px; color: var(--muted);
+  }
+  .setup code{ background: var(--surface); padding: 2px 6px; border-radius: 4px; color: var(--gold); }
+
+  /* ---------- Admin ---------- */
+  .admin-toggle{
+    position: fixed; right: 18px; bottom: 18px; z-index: 30;
+    background: var(--surface); border: 1px solid var(--line); color: var(--muted);
+    width: 42px; height: 42px; border-radius: 50%; cursor:pointer; font-size: 16px;
+  }
+  .admin-panel{
+    position: fixed; inset:0; background: rgba(5,7,14,0.9); backdrop-filter: blur(6px);
+    z-index: 40; display:none; align-items:flex-start; justify-content:center; overflow:auto; padding: 40px 16px;
+  }
+  .admin-panel.open{ display:flex; }
+  .admin-box{
+    background: var(--bg-alt); border:1px solid var(--line); border-radius: var(--radius);
+    width: 100%; max-width: 640px; padding: 26px;
+  }
+  .admin-box h2{ font-size: 20px; margin: 0 0 4px; }
+  .admin-box .sub{ color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+  .field{ margin-bottom: 12px; }
+  .field label{ display:block; font-size: 12px; color: var(--muted); font-weight:700; margin-bottom: 5px; }
+  .field input, .field select{
+    width:100%; background: var(--surface); border:1px solid var(--line); color: var(--text);
+    padding: 10px 12px; border-radius: 8px; font-family:'Manrope',sans-serif; font-size: 14px;
+  }
+  .row2{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .btn{
+    background: var(--gold); color:#1a1305; border:none; padding: 11px 18px; border-radius: 8px;
+    font-weight: 800; cursor:pointer; font-size: 14px;
+  }
+  .btn.secondary{ background: transparent; border: 1px solid var(--line); color: var(--text); }
+  .btn.danger{ background: rgba(255,59,48,0.15); color: var(--live); border:1px solid rgba(255,59,48,.3); }
+  .admin-actions{ display:flex; gap:10px; margin-top: 6px; flex-wrap:wrap; }
+  .admin-error{ color: var(--live); font-size: 13px; margin-top: 8px; min-height: 18px; }
+  .close-x{ float:right; background:none; border:none; color: var(--muted); font-size: 20px; cursor:pointer; }
+
+  .score-edit{ display:flex; align-items:center; gap:8px; }
+  .score-edit button{ width:28px; height:28px; border-radius:6px; border:1px solid var(--line); background:var(--surface); color:var(--text); cursor:pointer; font-weight:800; }
+  .score-edit span{ min-width: 20px; text-align:center; font-weight:800; }
+
+  .admin-game{ border:1px solid var(--line); border-radius: 10px; padding: 14px; margin-bottom: 12px; background: var(--surface); }
+  .admin-game-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .admin-game-top strong{ font-size: 14px; }
+
+  footer{ text-align:center; color: var(--muted); font-size: 12px; padding: 20px; }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">SANGRAM <span>2026</span></div>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="#" style="color:var(--text)">Live Scores</a>
+    </nav>
+  </div>
+
+  <div class="band" id="nextRoundBand" style="display:none;">
+    <div class="band-inner">
+      <div>
+        <div class="band-label">Next round starts in</div>
+        <div class="band-game" id="nextRoundGame">—</div>
+      </div>
+      <div class="band-time" id="nextRoundTimer">
+        <div class="unit"><span id="nr-h">00</span><small>HRS</small></div>
+        <div class="unit">:</div>
+        <div class="unit"><span id="nr-m">00</span><small>MIN</small></div>
+        <div class="unit">:</div>
+        <div class="unit"><span id="nr-s">00</span><small>SEC</small></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">All Games</button>
+    <button class="filter-btn" data-filter="live">Live</button>
+    <button class="filter-btn" data-filter="upcoming">Upcoming</button>
+    <button class="filter-btn" data-filter="finished">Finished</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="emptyState" style="display:none;">No games match this filter yet.</div>
+  <div class="setup" id="setupState" style="display:none;">
+    Live scores aren't connected yet.<br/>
+    Add your Firebase config in <code>live-scores.html</code> to go live.
+  </div>
+
+  <footer>Scores update instantly — no need to refresh.</footer>
+
+  <button class="admin-toggle" id="adminToggle" title="Organiser login">⚙</button>
+
+  <div class="admin-panel" id="adminPanel">
+    <div class="admin-box">
+      <button class="close-x" id="adminClose">×</button>
+
+      <div id="loginView">
+        <h2>Organiser login</h2>
+        <div class="sub">Sign in to update live scores and round timings.</div>
+        <div class="field"><label>Email</label><input type="email" id="loginEmail" autocomplete="username" /></div>
+        <div class="field"><label>Password</label><input type="password" id="loginPassword" autocomplete="current-password" /></div>
+        <button class="btn" id="loginBtn">Sign in</button>
+        <div class="admin-error" id="loginError"></div>
+      </div>
+
+      <div id="managerView" style="display:none;">
+        <h2>Manage games</h2>
+        <div class="sub">Changes appear on the live page instantly. <a href="#" id="logoutBtn" style="color:var(--gold); font-weight:700;">Sign out</a></div>
+        <div id="adminGameList"></div>
+        <button class="btn secondary" id="addGameBtn">+ Add game</button>
+      </div>
+    </div>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getDatabase, ref, onValue, push, update, remove, set
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  import {
+    getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  // ============================================================
+  // 1. PASTE YOUR FIREBASE CONFIG HERE (from Firebase Console →
+  //    Project settings → General → Your apps → SDK setup)
+  // ============================================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyDirU8WPOXG702A0obsl6aRogb4gVr5Rq4",
+    authDomain: "scoreboard-b3823.firebaseapp.com",
+    databaseURL: "https://scoreboard-b3823-default-rtdb.firebaseio.com",
+    projectId: "scoreboard-b3823",
+    storageBucket: "scoreboard-b3823.firebasestorage.app",
+    messagingSenderId: "484275802139",
+    appId: "1:484275802139:web:7745835b75e60c31f368be"
+  };
+
+  const isConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
+
+  let db, auth, gamesRef;
+  let allGames = {};
+  let currentFilter = "all";
+  const TEAM_COLORS = { Red:"var(--red)", Blue:"var(--blue)", Yellow:"var(--yellow)", Green:"var(--green)" };
+
+  const grid = document.getElementById("grid");
+  const emptyState = document.getElementById("emptyState");
+  const setupState = document.getElementById("setupState");
+
+  if (!isConfigured) {
+    setupState.style.display = "block";
+  } else {
+    const app = initializeApp(firebaseConfig);
+    db = getDatabase(app);
+    auth = getAuth(app);
+    gamesRef = ref(db, "games");
+
+    const SEED_GAMES = {
+      g01: { name:"Volleyball", teamA:"Team A", teamAColor:"Red", teamB:"Team B", teamBColor:"Blue", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:1 },
+      g02: { name:"Throwball", teamA:"Team A", teamAColor:"Yellow", teamB:"Team B", teamBColor:"Green", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:2 },
+      g03: { name:"Basketball", teamA:"Team A", teamAColor:"Red", teamB:"Team B", teamBColor:"Green", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:3 },
+      g04: { name:"Football", teamA:"Team A", teamAColor:"Blue", teamB:"Team B", teamBColor:"Yellow", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:4 },
+      g05: { name:"Beach Football", teamA:"Team A", teamAColor:"Red", teamB:"Team B", teamBColor:"Blue", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:5 },
+      g06: { name:"Short Cricket", teamA:"Team A", teamAColor:"Yellow", teamB:"Team B", teamBColor:"Green", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:6 },
+      g07: { name:"Kabaddi", teamA:"Team A", teamAColor:"Red", teamB:"Team B", teamBColor:"Yellow", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:7 },
+      g08: { name:"Tug of War", teamA:"Team A", teamAColor:"Blue", teamB:"Team B", teamBColor:"Green", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:8 },
+      g09: { name:"Table Tennis Solo", teamA:"Player A", teamAColor:"Red", teamB:"Player B", teamBColor:"Blue", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:9 },
+      g10: { name:"Table Tennis Group", teamA:"Team A", teamAColor:"Yellow", teamB:"Team B", teamBColor:"Green", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:10 },
+      g11: { name:"Badminton Solo", teamA:"Player A", teamAColor:"Red", teamB:"Player B", teamBColor:"Yellow", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:11 },
+      g12: { name:"Badminton Group", teamA:"Team A", teamAColor:"Blue", teamB:"Team B", teamBColor:"Green", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:12 },
+      g13: { name:"Chess", teamA:"Player A", teamAColor:"Red", teamB:"Player B", teamBColor:"Blue", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:13 },
+      g14: { name:"Athletics 100M", teamA:"Heat 1", teamAColor:"Red", teamB:"Heat 2", teamBColor:"Blue", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:14 },
+      g15: { name:"Athletics 200M", teamA:"Heat 1", teamAColor:"Yellow", teamB:"Heat 2", teamBColor:"Green", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:15 },
+      g16: { name:"Athletics 400M", teamA:"Heat 1", teamAColor:"Red", teamB:"Heat 2", teamBColor:"Green", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:16 },
+      g17: { name:"Athletics 800M", teamA:"Heat 1", teamAColor:"Blue", teamB:"Heat 2", teamBColor:"Yellow", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:17 },
+      g18: { name:"Relay Race 100x4", teamA:"Team A", teamAColor:"Red", teamB:"Team B", teamBColor:"Blue", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:18 },
+      g19: { name:"Relay Race 400x4", teamA:"Team A", teamAColor:"Yellow", teamB:"Team B", teamBColor:"Green", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:19 },
+      g20: { name:"Shot Put", teamA:"Player A", teamAColor:"Red", teamB:"Player B", teamBColor:"Yellow", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:20 },
+      g21: { name:"Javelin Throw", teamA:"Player A", teamAColor:"Blue", teamB:"Player B", teamBColor:"Green", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:21 },
+      g22: { name:"Discus Throw", teamA:"Player A", teamAColor:"Red", teamB:"Player B", teamBColor:"Blue", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:22 },
+      g23: { name:"Long Jump", teamA:"Player A", teamAColor:"Yellow", teamB:"Player B", teamBColor:"Green", scoreA:0, scoreB:0, status:"upcoming", round:"TBD", venue:"", nextRoundTime:"", order:23 }
+    };
+    let seedAttempted = false;
+
+    onValue(gamesRef, (snap) => {
+      allGames = snap.val() || {};
+      if (!snap.exists() && !seedAttempted) {
+        seedAttempted = true;
+        set(gamesRef, SEED_GAMES);
+      }
+      renderGrid();
+      renderNextRoundBand();
+      if (managerOpen) renderAdminList();
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      document.getElementById("loginView").style.display = user ? "none" : "block";
+      document.getElementById("managerView").style.display = user ? "block" : "none";
+      if (user) renderAdminList();
+    });
+  }
+
+  // ---------- Filters ----------
+  document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentFilter = btn.dataset.filter;
+      renderGrid();
+    });
+  });
+
+  // ---------- Public grid ----------
+  function renderGrid(){
+    const entries = Object.entries(allGames);
+    const filtered = entries.filter(([id, g]) => currentFilter === "all" ? true : g.status === currentFilter);
+    grid.innerHTML = "";
+    emptyState.style.display = (isConfigured && filtered.length === 0) ? "block" : "none";
+
+    filtered
+      .sort((a,b) => (a[1].order||0) - (b[1].order||0))
+      .forEach(([id, g]) => grid.appendChild(buildCard(id, g)));
+  }
+
+  function buildCard(id, g){
+    const card = document.createElement("div");
+    card.className = `card status-${g.status || "upcoming"}`;
+
+    const pillHtml = g.status === "live"
+      ? `<div class="pill live"><span class="dot"></span>LIVE</div>`
+      : g.status === "finished"
+      ? `<div class="pill finished">FULL TIME</div>`
+      : `<div class="pill upcoming">UPCOMING</div>`;
+
+    const colorA = TEAM_COLORS[g.teamAColor] || "var(--muted)";
+    const colorB = TEAM_COLORS[g.teamBColor] || "var(--muted)";
+    const scoreClass = g.status === "upcoming" ? "score dim" : "score";
+
+    card.innerHTML = `
+      <div class="card-head">
+        <div>
+          <div class="game-name">${escapeHtml(g.name || "Untitled")}</div>
+          <div class="game-meta">${escapeHtml(g.round || "")}${g.venue ? " · " + escapeHtml(g.venue) : ""}</div>
+        </div>
+        ${pillHtml}
+      </div>
+      <div class="matchup">
+        <div class="team">
+          <div class="swatch" style="background:${colorA}"></div>
+          <div class="team-name">${escapeHtml(g.teamA || "TBD")}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <div class="${scoreClass}">${g.status==="upcoming" ? "–" : (g.scoreA ?? 0)}</div>
+          <div class="score dim" style="font-size:16px;">:</div>
+          <div class="${scoreClass}">${g.status==="upcoming" ? "–" : (g.scoreB ?? 0)}</div>
+        </div>
+        <div class="team right">
+          <div class="swatch" style="background:${colorB}"></div>
+          <div class="team-name">${escapeHtml(g.teamB || "TBD")}</div>
+        </div>
+      </div>
+      <div class="card-foot">
+        <span>${escapeHtml(g.venue || "")}</span>
+        <span class="foot-countdown" data-next="${g.nextRoundTime || ""}"></span>
+      </div>
+    `;
+    return card;
+  }
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+  }
+
+  // ---------- Next round band + per-card countdowns ----------
+  function renderNextRoundBand(){
+    const band = document.getElementById("nextRoundBand");
+    const upcoming = Object.values(allGames)
+      .filter(g => g.nextRoundTime && new Date(g.nextRoundTime) > new Date())
+      .sort((a,b) => new Date(a.nextRoundTime) - new Date(b.nextRoundTime));
+
+    if (!upcoming.length){ band.style.display = "none"; return; }
+    band.style.display = "block";
+    document.getElementById("nextRoundGame").textContent =
+      `${upcoming[0].name || "Match"} — ${upcoming[0].round || "Next round"}`;
+  }
+
+  setInterval(() => {
+    const upcoming = Object.values(allGames)
+      .filter(g => g.nextRoundTime && new Date(g.nextRoundTime) > new Date())
+      .sort((a,b) => new Date(a.nextRoundTime) - new Date(b.nextRoundTime));
+
+    if (upcoming.length){
+      const diff = new Date(upcoming[0].nextRoundTime) - new Date();
+      const h = Math.floor(diff / 3.6e6);
+      const m = Math.floor((diff % 3.6e6) / 6e4);
+      const s = Math.floor((diff % 6e4) / 1000);
+      document.getElementById("nr-h").textContent = String(h).padStart(2,"0");
+      document.getElementById("nr-m").textContent = String(m).padStart(2,"0");
+      document.getElementById("nr-s").textContent = String(s).padStart(2,"0");
+    }
+
+    document.querySelectorAll(".foot-countdown").forEach(el => {
+      const t = el.dataset.next;
+      if (!t) { el.textContent = ""; return; }
+      const diff = new Date(t) - new Date();
+      if (diff <= 0){ el.textContent = ""; return; }
+      const h = Math.floor(diff / 3.6e6);
+      const m = Math.floor((diff % 3.6e6) / 6e4);
+      const s = Math.floor((diff % 6e4) / 1000);
+      el.textContent = `Starts in ${h ? h+"h " : ""}${m}m ${s}s`;
+    });
+  }, 1000);
+
+  // ============================================================
+  // ADMIN PANEL
+  // ============================================================
+  const adminPanel = document.getElementById("adminPanel");
+  let managerOpen = false;
+
+  document.getElementById("adminToggle").addEventListener("click", () => {
+    if (!isConfigured){ alert("Connect Firebase first — see setup instructions."); return; }
+    adminPanel.classList.add("open");
+    managerOpen = true;
+  });
+  document.getElementById("adminClose").addEventListener("click", () => {
+    adminPanel.classList.remove("open");
+    managerOpen = false;
+  });
+
+  document.getElementById("loginBtn").addEventListener("click", async () => {
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    const errEl = document.getElementById("loginError");
+    errEl.textContent = "";
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (e) {
+      errEl.textContent = "Couldn't sign in — check email and password.";
+    }
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click", (e) => {
+    e.preventDefault();
+    signOut(auth);
+  });
+
+  document.getElementById("addGameBtn").addEventListener("click", async () => {
+    const newRef = push(gamesRef);
+    await set(newRef, {
+      name: "New Game",
+      teamA: "Team A", teamAColor: "Red",
+      teamB: "Team B", teamBColor: "Blue",
+      scoreA: 0, scoreB: 0,
+      status: "upcoming",
+      round: "Round 1",
+      venue: "",
+      nextRoundTime: "",
+      order: Date.now()
+    });
+  });
+
+  function renderAdminList(){
+    const list = document.getElementById("adminGameList");
+    list.innerHTML = "";
+    Object.entries(allGames)
+      .sort((a,b) => (a[1].order||0) - (b[1].order||0))
+      .forEach(([id, g]) => list.appendChild(buildAdminRow(id, g)));
+  }
+
+  function buildAdminRow(id, g){
+    const row = document.createElement("div");
+    row.className = "admin-game";
+    row.innerHTML = `
+      <div class="admin-game-top">
+        <strong>${escapeHtml(g.name || "Untitled")}</strong>
+        <button class="btn danger" data-action="delete">Delete</button>
+      </div>
+      <div class="field"><label>Game name</label><input type="text" data-field="name" value="${escapeHtml(g.name||"")}" /></div>
+      <div class="row2">
+        <div class="field"><label>Team A</label><input type="text" data-field="teamA" value="${escapeHtml(g.teamA||"")}" /></div>
+        <div class="field"><label>Team A color</label>
+          <select data-field="teamAColor">
+            ${["Red","Blue","Yellow","Green"].map(c => `<option ${g.teamAColor===c?"selected":""}>${c}</option>`).join("")}
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Team B</label><input type="text" data-field="teamB" value="${escapeHtml(g.teamB||"")}" /></div>
+        <div class="field"><label>Team B color</label>
+          <select data-field="teamBColor">
+            ${["Red","Blue","Yellow","Green"].map(c => `<option ${g.teamBColor===c?"selected":""}>${c}</option>`).join("")}
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Score A</label>
+          <div class="score-edit">
+            <button data-action="decA">−</button><span data-display="scoreA">${g.scoreA ?? 0}</span><button data-action="incA">+</button>
+          </div>
+        </div>
+        <div class="field"><label>Score B</label>
+          <div class="score-edit">
+            <button data-action="decB">−</button><span data-display="scoreB">${g.scoreB ?? 0}</span><button data-action="incB">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Status</label>
+          <select data-field="status">
+            ${["upcoming","live","finished"].map(s => `<option value="${s}" ${g.status===s?"selected":""}>${s}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field"><label>Round</label><input type="text" data-field="round" value="${escapeHtml(g.round||"")}" /></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Venue</label><input type="text" data-field="venue" value="${escapeHtml(g.venue||"")}" /></div>
+        <div class="field"><label>Next round time</label><input type="datetime-local" data-field="nextRoundTime" value="${toLocalInput(g.nextRoundTime)}" /></div>
+      </div>
+    `;
+
+    row.querySelectorAll("[data-field]").forEach(el => {
+      el.addEventListener("change", () => {
+        let val = el.value;
+        if (el.dataset.field === "nextRoundTime" && val) val = new Date(val).toISOString();
+        update(ref(db, `games/${id}`), { [el.dataset.field]: val });
+      });
+    });
+
+    row.querySelector('[data-action="delete"]').addEventListener("click", () => {
+      if (confirm("Delete this game?")) remove(ref(db, `games/${id}`));
+    });
+    row.querySelector('[data-action="incA"]').addEventListener("click", () => bumpScore(id, "scoreA", 1));
+    row.querySelector('[data-action="decA"]').addEventListener("click", () => bumpScore(id, "scoreA", -1));
+    row.querySelector('[data-action="incB"]').addEventListener("click", () => bumpScore(id, "scoreB", 1));
+    row.querySelector('[data-action="decB"]').addEventListener("click", () => bumpScore(id, "scoreB", -1));
+
+    return row;
+  }
+
+  function bumpScore(id, field, delta){
+    const current = allGames[id]?.[field] ?? 0;
+    update(ref(db, `games/${id}`), { [field]: Math.max(0, current + delta) });
+  }
+
+  function toLocalInput(iso){
+    if (!iso) return "";
+    const d = new Date(iso);
+    const pad = n => String(n).padStart(2,"0");
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+</script>
+</body>
+</html>
